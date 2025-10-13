@@ -1,103 +1,145 @@
-import Image from "next/image";
+
+'use client';
+import {useState, useEffect} from 'react';
+import {initWalletSelector} from '@/lib/near';
+import type {
+ WalletSelector
+} from '@near-wallet-selector/core/src/lib/wallet-selector.types.ts'
+import type {
+  WalletSelectorModal
+} from '@near-wallet-selector/modal-ui/src/lib/modal.types.ts'
+import type{
+  WalletSelectorState
+} from '@near-wallet-selector/core/src/lib/store.types.ts'
+
+import useNearBalance from "../hooks/useNearBalance"
+
+
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+ //tracking connection
+ const [accountId, setAccountId] = useState<string | null>(null);
+
+ const [selector, setSelector] = useState<WalletSelector | null>(null);
+
+ const [modal, setModal] = useState<WalletSelectorModal | null>(null);
+
+ const [loading, setLoading] = useState(true);
+ 
+ const data: {
+    balance: number;
+    yoctoBalance: string;
+    loading: boolean;
+    error: Error | null;
+}
+ = useNearBalance(accountId); 
+
+ useEffect(() => {
+  
+   const setupWallet = async () =>{
+
+     try{
+
+      const {selector: _selector, modal:_modal} = await initWalletSelector();
+      
+      setSelector(_selector);
+      setModal(_modal);
+      
+      //check if user is already connected
+      const state = _selector.store.getState();
+      if(state.accounts.length > 0){
+        setAccountId(state.accounts[0].accountId);
+      }
+
+      setLoading(false);
+
+
+
+     }catch(error){
+
+      console.error("FAILED TO INITIALIZE WALLET:", error);
+      setLoading(false);
+
+     }
+   };
+
+   setupWallet();
+
+   
+
+ }, []);
+
+
+//listen for wallet state changes
+ useEffect(()=>{
+  if(!selector) return;
+  
+  const subscription = selector.store.observable.subscribe((state: WalletSelectorState)=>{
+   //when state changes check if there are connected accounts
+   if(state.accounts.length > 0){
+    setAccountId(state.accounts[0].accountId);
+   }else{
+    setAccountId(null);
+   }
+
+  })
+
+  return () => subscription.unsubscribe();
+
+
+
+ }, [selector]);
+
+ const handleConnect = () =>{
+  if(modal){
+    modal.show();
+  }
+ };
+
+ const handleDisconnect = async ()=>{
+  if(!selector) return;
+
+  const wallet = await selector.wallet();
+  await wallet.signOut();
+  setAccountId(null);
+
+ };
+
+ if(loading){
+  return(
+    <main className="p-5">
+      <h1>Cyphex</h1>
+      <p>Initialazing wallet connection...</p>
+    </main>
+  );
+ }
+
+  return (
+    <div >
+      <main className="min-h-screen p-2 m-auto ">
+        <h1>Cyphex</h1>
+
+        { !accountId ? 
+          (<div>
+            <p>Connect your NEAR wallet to continue</p>
+            <button className=" bg-amber-400"
+            onClick={handleConnect}>Connect Wallet</button>
+          </div>) : 
+          (
+            <div>
+              <p>Connected as: <strong>{accountId}</strong></p>
+
+              <button className="border-amber-50 bg-amber-50"
+              onClick={handleDisconnect}>Disconnect</button>
+            </div>
+          )
+        }
+
+
+       
+      
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
