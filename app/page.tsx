@@ -122,16 +122,28 @@ export default function Home() {
 
         { !accountId ? 
           (<div>
-            <p>Connect your NEAR wallet to continue</p>
-            <button className=" bg-amber-400"
+            <p className="m-2">Connect your NEAR wallet to continue</p>
+            <button className="m-1 bg-amber-400"
             onClick={handleConnect}>Connect Wallet</button>
           </div>) : 
           (
             <div>
-              <p>Connected as: <strong>{accountId}</strong></p>
+              <p className="m-2">Connected as: <strong>{accountId}</strong></p>
 
-              <button className="border-amber-50 bg-amber-50"
+             
+
+              <div className="m-2 p-2 bg-amber-400">
+                
+                {data.loading ? 
+                (<h2>loading balance...</h2>) : data.error ? (<p>ERROR: {data.error.message}</p>) :
+               
+               (<h2>{ data.balance + " Ⓝ"}</h2>)}
+                 
+              </div>
+              
+              <button className="m-1 border-amber-50 bg-amber-50"
               onClick={handleDisconnect}>Disconnect</button>
+              
             </div>
           )
         }

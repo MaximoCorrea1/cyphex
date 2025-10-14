@@ -1,5 +1,6 @@
 //chyphex/hooks/
 import {useState, useEffect} from 'react'
+import {yoctoToDecimal} from "@/lib/utils/yoctoToDecimal"
 
 export default function useNearBalance(accountId: string | null){
  const [loading, setLoading] = useState<boolean>(false);
@@ -9,7 +10,7 @@ export default function useNearBalance(accountId: string | null){
  const [yoctoBalance, setYoctoBalance] = useState<string>("0");
 
  useEffect(()=>{
- if(!accountId) return;
+  if(!accountId) return;
 
   async function fetchBalance(){
     setLoading(true);
@@ -34,9 +35,18 @@ export default function useNearBalance(accountId: string | null){
         })
       });
 
-      const data= await response.json();
-
+      const data = await response.json();
       console.log("RPC RESPONSE: ",data);
+
+      const amount =  data.result.amount;
+      const balance = yoctoToDecimal(amount);
+
+      setYoctoBalance(amount);
+      setBalance(balance);
+
+      console.log(amount, balance);
+
+      
 
     }catch(err){
         setError(err as Error);
