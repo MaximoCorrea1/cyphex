@@ -12,7 +12,7 @@ export async function POST(request: Request){
 
   });
 
-  const data =  await response.json();
+  const data = await response.json();
   return Response.json(data);
 
 }

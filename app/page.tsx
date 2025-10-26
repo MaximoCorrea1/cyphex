@@ -16,6 +16,7 @@ import useNearBalance from "../hooks/useNearBalance"
 
 
 
+
 export default function Home() {
 
  //tracking connection
@@ -34,6 +35,24 @@ export default function Home() {
     error: Error | null;
 }
  = useNearBalance(accountId); 
+
+ useEffect(()=>{
+ async function testAPI(){
+  const response = await fetch("/api/near-history",{
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({accountId: "maxoc.near"})
+  })
+  const data = await response.json();
+  console.log(data);
+ }
+
+ testAPI();
+
+}, []);
+
 
  useEffect(() => {
   
