@@ -41,7 +41,7 @@ export async function POST(request: Request){
      //fetch all txs
      let page =1;
      const allReceipts: NearBlocksReceipt[] = [];
-     const PER_PAGE = 250;  
+     const PER_PAGE = 6;  
 
      console.log("fetching txs for user: ", accountId);
 
@@ -103,8 +103,8 @@ export async function POST(request: Request){
         signerId: receipt.predecessor_account_id,
         receiverId: receipt.receiver_account_id,
         blockTimeStamp: Math.floor(receipt.receipt_block.block_timestamp / 1_000_000_000),//nanoseconds to seconds
-        amount: receipt.actions[0].deposit.toString(),
-        actions: [{kind: receipt.actions[0].action, args: receipt.actions[0].deposit }]
+        amount: receipt.actions[0].deposit.toFixed(1),
+        actions: [{kind: receipt.actions[0].action, args: receipt.actions[0].deposit.toFixed(1) }]
      }));
 
      //get account creation time (earliest receipt)

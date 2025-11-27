@@ -1,19 +1,22 @@
-//lib/utils/yoctoToDecimal()
+// lib/utils/yoctoToDecimal.ts
 
-export function yoctoToDecimal(str: string){
-
-    if(!str || str === "0") return 0;
-    
-    let numberStr = str;
-    
-    numberStr = numberStr.padStart(25, "0");
-
-    numberStr = numberStr.slice(0, -24) + "." + numberStr.slice(-24);
-
-    console.log(numberStr);
-
-    
+import { NEAR } from '@near-js/tokens'
 
 
-    return parseFloat(numberStr);
+export function yoctoToDecimal(yoctoAmount: string | number): number {
+  // Convert to string if it's a number
+  const yoctoStr = typeof yoctoAmount === 'number' 
+    ? yoctoAmount.toFixed(0) 
+    : yoctoAmount;
+  
+  // Handle empty or zero
+  if (!yoctoStr || yoctoStr === "0") return 0;
+  
+  
+  const decimal = NEAR.toDecimal(yoctoStr);
+  
+  
+ 
+  
+  return parseFloat(decimal);
 }
