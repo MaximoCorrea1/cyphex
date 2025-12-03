@@ -1,8 +1,8 @@
-import {BalanceSnapshot, NearTransaction} from "../types";
-import {yoctoToDecimal} from "../utils/yoctoToDecimal"
+import {BalanceSnapshot, Transaction} from "../types";
+import {yoctoToDecimal} from "./toDecimal"
 
 export function calculateBalanceSnapshots(
- transactions: NearTransaction[],
+ transactions: Transaction[],
  accountId: string,
  accountCreationTime: number,
  currentTime: number,

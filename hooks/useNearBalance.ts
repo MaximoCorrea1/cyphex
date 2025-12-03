@@ -1,6 +1,6 @@
 //chyphex/hooks/
 import {useState, useEffect} from 'react'
-import {yoctoToDecimal} from "@/lib/utils/yoctoToDecimal"
+import {yoctoToDecimal} from "@/lib/utils/toDecimal"
 
 export default function useNearBalance(accountId: string | null){
  const [loading, setLoading] = useState<boolean>(false);
