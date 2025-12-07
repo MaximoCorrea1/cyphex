@@ -1,16 +1,29 @@
 // chain-agnostic decimal conversion
 
-export function toDecimal(amount: string | number, decimals: number): number{
+export function toDecimal(amount: string, decimals: number): string {
 
-  //normalize input to str
-  const amountStr = typeof amount === 'number' ? amount.toFixed(0) : amount;
 
-  if(!amountStr || amountStr === "0") return 0;
+  if (typeof amount != 'string') throw new Error('input is not a string');
 
-  const isNegative = amountStr.startsWith('-');
-  const absoluteAmount = isNegative ? amountStr.slice(1) : amountStr;
+  if (!amount || amount === "0") return "0";
 
-  const padded = absoluteAmount.padStart(decimals + 1, '0');
+  const isNegative = amount.startsWith('-');
+  const absoluteAmount = isNegative ? amount.slice(1) : amount;
 
-  const integerPart = padded.slice(0, )
+  //check if we need padding 10, 1
+  let padded = absoluteAmount;
+
+  if (absoluteAmount.length <= decimals) {
+    padded = absoluteAmount.padStart(decimals + 1, '0');
+  }
+
+  const integerPart = padded.slice(0, padded.length - decimals);
+  const decimalPart = padded.slice(padded.length - decimals, padded.length);
+
+  //remove trailing zeros from decimal part
+  const trimmedDecimalPart = decimalPart.replace(/0+$/, '');
+
+  return integerPart + "." + trimmedDecimalPart;
+
+
 }
