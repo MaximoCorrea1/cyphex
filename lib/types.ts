@@ -27,8 +27,8 @@ export interface Token{
 export interface TokenBalance{
   token: Token;
   rawBalance: string;
-  balance: number;
-  usdValue?: number;
+  balance: string;
+  usdValue?: string;
 }
 
 // ---TRANSACTION TYPES----
@@ -70,9 +70,9 @@ export interface Transaction{
 //single point in time balance spanshot. this builds the historical chart
 export interface BalanceSnapshot{
   timestamp: number; //unix
-  balance: number; //human readable
-  usdValue?: number;
-  blockNumer?: number;
+  balance: string; //human readable
+  usdValue?: string;
+  blockNumber?: number;
 }
 
 //historical balance by token
@@ -92,7 +92,7 @@ export interface AddressPortfolio{
   address: Address;
   nativeBalance: TokenBalance;
   tokenBalances: TokenBalance[];
-  totalUsdValue?: number;
+  totalUsdValue?: string;
   lastUpdated: number;
 
 }
@@ -103,7 +103,7 @@ export interface AddressPortfolio{
 export interface Portfolio {
   addresses: Address[];
   portfolios: AddressPortfolio[];
-  totalUsdValue?: number;
+  totalUsdValue?: string;
   lastUpdated: number;
 }
 
